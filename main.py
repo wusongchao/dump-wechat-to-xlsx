@@ -33,6 +33,7 @@ MESSAGE_INFO = {
     "msgSvrId": "",
     "type": "",
     "status": "",
+    "isSend": "",
     "createTime": "",
     "talker": "",
     "content": "",
@@ -117,7 +118,7 @@ def generate_xlsx(pathname):
     ws = wb.add_worksheet()
     # number_format = wb.add_format({"num_format": ""})
 
-    header = ["msgId", "msgSvrId", "talkerUsername", "talkerNickname",
+    header = ["msgId", "msgSvrId", "isSend", "talkerUsername", "talkerNickname",
               "type", "content", "sourcePath", "createTime"]
     ws.write_row("A1", header)
 
@@ -127,19 +128,23 @@ def generate_xlsx(pathname):
     for line in MESSAGE_LIST:
         ws.write(row, col, line["msgId"])
         ws.write(row, col+1, line["msgSvrId"])
-        ws.write(row, col+2, line["talker"])
-        ws.write(row, col+3, RCONTACT_LIST[int(line["talkerId"])]["nickname"])
+        ws.write(row, col+2, line["isSend"])
+        ws.write(row, col+3, line["talker"])
+        ws.write(row, col+4, RCONTACT_LIST[int(line["talkerId"])]["nickname"])
 
         if line["type"] in MESSAGE_TYPE.keys():
-            ws.write(row, col+4, MESSAGE_TYPE[line["type"]])
+            ws.write(row, col+5, MESSAGE_TYPE[line["type"]])
         else:
-            ws.write(row, col+4, "")
-        ws.write(row, col+5, line["content"])
+            ws.write(row, col+5, "")
+        ws.write(row, col+6, line["content"])
 
         if line["type"] == "3":  # represent img
-            ws.write(row, col+6, search_img_by_thumbnail(line["imgPath"]))
+            img_path = search_img_by_thumbnail(line["imgPath"])
+            ws.write(row, col+7, img_path[:2] + "/" + img_path[2:4] + "/" + img_path)
+        elif line["type"] == "34":
+            ws.write(row, col+7, "msg_" + line["imgPath"] + ".amr")
 
-        ws.write(row, col+7, line["createTime"])
+        ws.write(row, col+8, line["createTime"])
 
         row += 1
 
